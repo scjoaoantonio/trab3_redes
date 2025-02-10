@@ -1,4 +1,4 @@
-# 📄 **README - Protocolo Stop-and-Wait com UDP**  
+# 📄 **Protocolo Stop-and-Wait com UDP**  
 
 ## 📌 **Descrição**  
 Este projeto implementa um protocolo de parada e espera (**Stop-and-Wait**) para **transmissão confiável de arquivos** utilizando **sockets UDP**. O protocolo garante que os pacotes sejam entregues corretamente, lidando com **perda de pacotes**, **retransmissões** e **eliminação de duplicatas**.  
