@@ -5,6 +5,7 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <time.h>
+#include <sys/time.h>  
 
 #define PORTA_PADRAO 8080
 #define TAM_PACOTE 1024
@@ -33,7 +34,7 @@ void enviar_arquivo(int sock, struct sockaddr_in servidor, char *nome_arquivo)
 
     Pacote pacote;
     int num_seq = 0, bytes_lidos, servidor_len = sizeof(servidor);
-    struct timeval timeout = {TIMEOUT, 0};
+    struct timeval timeout = {TIMEOUT, 0};  // Estrutura timeval definida corretamente
     setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
 
     while ((bytes_lidos = fread(pacote.dados, 1, TAM_PACOTE, arquivo)) > 0)
