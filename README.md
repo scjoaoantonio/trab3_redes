@@ -9,6 +9,7 @@ Este projeto implementa um protocolo de parada e espera (**Stop-and-Wait**) para
 |-- cliente.c    # Implementação do cliente UDP
 |-- servidor.c   # Implementação do servidor UDP
 |-- README.md    # Documentação do projeto
+|-- gera.py      # Script para gerar arquivos binários de tamanhos variados
 ```
 
 ## 🛠 **Funcionalidades**  

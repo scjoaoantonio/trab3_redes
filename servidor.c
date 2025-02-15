@@ -10,22 +10,19 @@
 #define TAM_PACOTE 1024
 #define PROB_PERDA 10
 
-typedef struct
-{
+typedef struct {
     int num_seq;
+    int tamanho;
     char dados[TAM_PACOTE];
 } Pacote;
 
-int simular_perda()
-{
+int simular_perda() {
     return (rand() % 100) < PROB_PERDA;
 }
 
-void receber_arquivo(int sock)
-{
-    FILE *arquivo = fopen("arquivo_recebido", "wb");
-    if (!arquivo)
-    {
+void receber_arquivo(int sock) {
+    FILE *arquivo = fopen("arquivo_recebido.bin", "wb");
+    if (!arquivo) {
         perror("Erro ao abrir arquivo para escrita");
         exit(EXIT_FAILURE);
     }
@@ -35,29 +32,26 @@ void receber_arquivo(int sock)
     Pacote pacote;
     int ultimo_num_seq = -1;
 
-    while (1)
-    {
+    while (1) {
         int recebido = recvfrom(sock, &pacote, sizeof(pacote), 0, (struct sockaddr *)&cliente, &cliente_len);
-        if (recebido > 0)
-        {
-            if (pacote.num_seq == ultimo_num_seq)
-            {
-                printf("Pacote duplicado %d descartado\n", pacote.num_seq);
+        if (recebido > 0) {
+            if (pacote.num_seq == -1) {
+                printf("Fim da transmissão recebido. Encerrando servidor.\n");
+                break;
             }
-            else
-            {
-                fwrite(pacote.dados, 1, TAM_PACOTE, arquivo);
+
+            if (pacote.num_seq == ultimo_num_seq) {
+                printf("Pacote duplicado %d descartado\n", pacote.num_seq);
+            } else {
+                fwrite(pacote.dados, 1, pacote.tamanho, arquivo);
                 printf("Recebido pacote %d\n", pacote.num_seq);
                 ultimo_num_seq = pacote.num_seq;
             }
 
-            if (!simular_perda())
-            {
+            if (!simular_perda()) {
                 sendto(sock, &ultimo_num_seq, sizeof(int), 0, (struct sockaddr *)&cliente, cliente_len);
                 printf("ACK enviado para pacote %d\n", ultimo_num_seq);
-            }
-            else
-            {
+            } else {
                 printf("Simulando perda do ACK %d\n", ultimo_num_seq);
             }
         }
@@ -66,10 +60,8 @@ void receber_arquivo(int sock)
     fclose(arquivo);
 }
 
-int main(int argc, char *argv[])
-{
-    if (argc != 2)
-    {
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
         printf("Uso: %s <porta>\n", argv[0]);
         return EXIT_FAILURE;
     }
@@ -77,8 +69,7 @@ int main(int argc, char *argv[])
     srand(time(NULL));
 
     int sock = socket(AF_INET, SOCK_DGRAM, 0);
-    if (sock < 0)
-    {
+    if (sock < 0) {
         perror("Erro ao criar socket");
         return EXIT_FAILURE;
     }
@@ -88,8 +79,7 @@ int main(int argc, char *argv[])
     servidor.sin_port = htons(atoi(argv[1]));
     servidor.sin_addr.s_addr = INADDR_ANY;
 
-    if (bind(sock, (struct sockaddr *)&servidor, sizeof(servidor)) < 0)
-    {
+    if (bind(sock, (struct sockaddr *)&servidor, sizeof(servidor)) < 0) {
         perror("Erro ao associar socket");
         return EXIT_FAILURE;
     }
